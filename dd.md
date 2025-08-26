@@ -1,0 +1,20 @@
+project/
+|--datasets/
+    |--meta-world/
+    |--d4rl/
+|--replay-buffer/
+    |--simple-buffer
+|--representation/
+    |--phi
+    |--psi
+|--agent/
+    |--gcrl
+|--baseline/
+    |--iql-agent
+|--networks/
+    |--encoders
+    |--qunctions
+    |--awrpolicy
+|--tests/
+    |--datasets
+    |--iql
