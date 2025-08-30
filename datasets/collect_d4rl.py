@@ -8,7 +8,7 @@ import gymnasium_robotics
 import numpy
 
 gymnasium.register_envs(gymnasium_robotics)
-import d4rl
+import datasets.collect_d4rl as collect_d4rl
 from torchrl.envs.libs.gym import GymEnv
 from torchrl.data.datasets.minari_data import MinariExperienceReplay
 from torchrl.data.replay_buffers import SamplerWithoutReplacement
@@ -50,18 +50,21 @@ class D4RLCollector:
         
         # Env for the Agent
         self.env_agent = FlattenObservation(self.env)
-        self.agent = SAC("MlpPolicy", self.env_agent)
-        self.agent.learn(total_timesteps=10_000_000, log_interval=4)
-        self.agent.save("sac")
+        agent = SAC("MlpPolicy", self.env_agent)
+        agent.learn(total_timesteps=10, log_interval=4)
+        agent.save("sac")
+        del agent
+
+        self.agent = SAC.load("sac")
         ep = 0
         obs, info = self.env_agent.reset()
         rewards = []
         
-        while ep < 20000:
+        while ep < 10:
             action, _states = self.agent.predict(obs, deterministic=True)
 
             # take action in the datacollector env for storage
-            obs_d, reward_d, done_d, trucated_d, info_d = self.env.step(action) 
+            # obs_d, reward_d, done_d, trucated_d, info_d = self.env.step(action) 
 
             # take action using the agent
             obs, reward, done, trucated, info = self.env_agent.step(action) 
@@ -74,12 +77,10 @@ class D4RLCollector:
                 rewards = []
 
         self.dataset = self.env.create_dataset(
-            dataset_id = "antmaze/sbsac-v1",
+            dataset_id = "antmaze/sbsac-v0",
         )
-
         return self.dataset
         
 
 
-collector = D4RLCollector(env_id = 'AntMaze_Medium-v4')
-collector.collect_data()
+
