@@ -19,11 +19,8 @@ class CommonBuffer:
     def build_offline_buffer(self, type_id, **kwargs):
 
         minari_buffer = kwargs.get(type_id, TensorDict({})) # this should return TensorDictType - agrees on the leading dimensions of all entries.
-
         if type_id == 'd4rl':
             self.buffer = minari_buffer
-
-            
 
     def sample(self):
         return self.buffer.sample()

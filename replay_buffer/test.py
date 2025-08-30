@@ -33,11 +33,10 @@ def test1():
 
 
 if __name__ == "__main__":
-    collector = D4RLCollector(env_id = 'AntMaze_Medium-v4')
+    # collector = D4RLCollector(env_id = 'AntMaze_Medium-v4', type = 'd4rl')
+    collector = D4RLCollector(env_id = 'Meta', type = 'metaworld')
     dataset = collector.collect_data()
-    replay_buffer = MinariExperienceReplay(dataset_id = "antmaze/sbsac-v0", batch_size=32, root = '/root/.minari/datasets/')
-    data = {'d4rl' : replay_buffer}
-    cb = CommonBuffer(1000, 32, 67, 'dr4l', data)
-    td = cb.sample()
-    print("rd collected")
-    
+    replay_buffer = dataset.sample_episodes(3)
+    print(replay_buffer[0].observations['observation'].shape)
+   
+   

@@ -2,13 +2,17 @@
 # sample 
 # sample goals 
 import os
+os.system('rm -rf /root/.minari/datasets/')
 os.environ["MUJOCO_GL"] = "egl"
+
+# import for D4RL datasets
 import gymnasium
+# imports for MetaWorld Datasets
+import metaworld
+from metaworld.policies import *
+
 import gymnasium_robotics
 import numpy
-
-gymnasium.register_envs(gymnasium_robotics)
-import datasets.collect_d4rl as collect_d4rl
 from torchrl.envs.libs.gym import GymEnv
 from torchrl.data.datasets.minari_data import MinariExperienceReplay
 from torchrl.data.replay_buffers import SamplerWithoutReplacement
@@ -42,12 +46,18 @@ from minari import DataCollector
 
 
 class D4RLCollector:
-    def __init__(self, env_id):
+    def __init__(self, env_id, type):
         self.env_id = env_id 
+        if type == 'd4rl':
+            gymnasium.register_envs(gymnasium_robotics)
+            env = gymnasium.make(self.env_id, render_mode="rgb_array")
+        else :
+            env = gymnasium.make('Meta-World/ML1-train', env_name='reach-V3', seed=98)
+        
+        self.env = DataCollector(env)
+        self.dataset_id = str(type)
     
     def collect_data(self):
-        self.env = DataCollector(gymnasium.make(self.env_id, render_mode="rgb_array")) # return a dict of observation and goals
-        
         # Env for the Agent
         self.env_agent = FlattenObservation(self.env)
         agent = SAC("MlpPolicy", self.env_agent)
@@ -77,7 +87,7 @@ class D4RLCollector:
                 rewards = []
 
         self.dataset = self.env.create_dataset(
-            dataset_id = "antmaze/sbsac-v0",
+            dataset_id = self.dataset_id + "/sbsac-v0",
         )
         return self.dataset
         
