@@ -37,6 +37,6 @@ if __name__ == "__main__":
     collector = D4RLCollector(env_id = 'Meta', type = 'metaworld')
     dataset = collector.collect_data()
     replay_buffer = dataset.sample_episodes(3)
-    print(replay_buffer[0].observations['observation'].shape)
+    # print(replay_buffer[0].observations['observation'].shape)
    
    
